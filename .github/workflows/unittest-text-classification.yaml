@@ -1,0 +1,24 @@
+name: text-classification
+
+on:
+ push:
+  branches: main
+ pull_request:
+  branches: main
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: addnab/docker-run-action@v3
+        with:
+          image: huggingface/transformers-pytorch-gpu:4.9.1
+          registry: null
+          options: -v ${{ github.workspace }}:/work
+          run: |
+            cd /work && ls .
+            export PYTHON=python3
+            export REPO_ROOT=$PWD
+            export COMPONENT_NAME=text-classification
+            sh scripts/component-unittest.sh

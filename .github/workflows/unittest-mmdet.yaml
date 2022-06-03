@@ -1,0 +1,24 @@
+name: mmdet
+
+on:
+ push:
+  branches: main
+ pull_request:
+  branches: main
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: addnab/docker-run-action@v3
+        with:
+          image: python:3.9.6
+          registry: null
+          options: -v ${{ github.workspace }}:/work
+          run: |
+            cd /work && ls .
+            export REPO_ROOT=$PWD
+            export COMPONENT_NAME=mmdet
+            export PYTHON=python3
+            sh scripts/component-unittest.sh

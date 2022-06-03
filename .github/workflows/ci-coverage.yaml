@@ -1,0 +1,29 @@
+name: CI
+
+on:
+ push:
+  branches: main
+ pull_request:
+  branches: main
+jobs:
+  pipelines:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: install CI dependencies
+        run: python3 -m pip install pytest
+      - name: run test
+        run: pytest scripts/test_all_pipelines_exist.py
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - uses: psf/black@stable
+      - name: run flake8
+        run: python3 -m pip install flake8 && flake8 --format github
