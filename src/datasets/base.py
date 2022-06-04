@@ -61,8 +61,12 @@ class SemanticSegmentationDataset(VisionDataset):
 
     def __getitem__(self, idx):
 
-        img = Image.open(os.path.join(self.image_root, self.list_of_images[idx]))
-        msk = Image.open(os.path.join(self.mask_root, self.list_of_masks[idx]))
+        img = Image.open(
+            os.path.join(self.image_root, self.list_of_images[idx])
+        ).convert("RBG")
+        msk = Image.open(os.path.join(self.mask_root, self.list_of_masks[idx])).convert(
+            "L"
+        )
 
         if self.transforms:
             if isinstance(self.transforms, (list, tuple)):
