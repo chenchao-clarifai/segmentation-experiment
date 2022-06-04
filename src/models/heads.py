@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+__all__ = ["Projector", "Bias", "PositiveReal"]
+
 
 class Projector(nn.Module):
     def __init__(self, in_dim, out_dim, normalized=True, norm_type=2.0, weight=None):
@@ -43,7 +45,7 @@ class Bias(nn.Module):
         super().__init__()
         self.num_dim = num_dim
         self._bias = nn.Parameter(torch.zeros(num_dim))
-        self.nonlinear = nonlinear
+        self.nonlinear = nonlinear()
 
     def forward(self):
         return self.nonlinear(self._bias)
