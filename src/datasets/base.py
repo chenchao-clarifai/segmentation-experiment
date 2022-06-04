@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import torch
 from PIL import Image
@@ -6,27 +7,45 @@ from torchvision.datasets import VisionDataset
 
 EXT = ["jpg", "jpeg", "png", "tiff", "tif"]
 
-__all__ = ["SemanticSegmentationBase"]
+__all__ = ["SemanticSegmentationDataset"]
 
 
-def is_image(filename):
+def is_image(filename: str, extension: Optional[str] = None) -> bool:
     ext = filename.split(".")[-1].lower()
-    return ext in EXT
+    if not extension:
+        return ext in EXT
+    return ext == extension.lower()
 
 
-class SemanticSegmentationBase(VisionDataset):
-    """Semantic Segmentation Dataset."""
+class SemanticSegmentationDataset(VisionDataset):
+    """Base Class for Semantic Segmentation Dataset."""
 
-    def __init__(self, image_root: str, mask_root: str, transforms=None):
+    def __init__(
+        self,
+        image_root: str,
+        mask_root: Optional[str] = None,
+        transforms=None,
+        image_ext="jpg",
+        mask_ext="png",
+    ):
         super().__init__(image_root, transforms=transforms)
 
+        if mask_root is None:
+            mask_root = image_root
         if isinstance(mask_root, torch._six.string_classes):
             mask_root = os.path.expanduser(mask_root)
+
+        self.image_ext = image_ext.strip().lower()
+        self.mask_ext = mask_ext.strip().lower()
         self.image_root = image_root
         self.mask_root = mask_root
 
-        list_of_images = sorted([p for p in os.listdir(image_root) if is_image(p)])
-        list_of_masks = sorted([p for p in os.listdir(mask_root) if is_image(p)])
+        list_of_images = sorted(
+            [p for p in os.listdir(image_root) if is_image(p, image_ext)]
+        )
+        list_of_masks = sorted(
+            [p for p in os.listdir(mask_root) if is_image(p, mask_ext)]
+        )
 
         for img_fn, msk_fn in zip(list_of_images, list_of_masks):
             assert (
