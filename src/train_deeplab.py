@@ -17,7 +17,7 @@ def get_logits(embeddings):
 def mini_train_step(mini_batch):
 
     img = mini_batch["image"].to(DEVICE)
-    msk = mini_batch["mask"].to(DEVICE)
+    msk = mini_batch["mask"].to(DEVICE) % 255
 
     msk = msk - 1  # 0: unlabeled -> -1: ignore
 
