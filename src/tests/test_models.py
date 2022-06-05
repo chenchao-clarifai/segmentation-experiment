@@ -32,8 +32,12 @@ def test_positive_real():
 
 
 def test_bias():
-    bias = models.heads.Bias(3)
+    bias = models.heads.Bias((3,))
     scripted = torch.jit.script(bias)
     print(scripted)
     assert bias().size() == (3,)
-    print(bias)
+
+    bias = models.heads.Bias((1, 3, 2, 1))
+    scripted = torch.jit.script(bias)
+    print(scripted)
+    assert bias().size() == (1, 3, 2, 1)

@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -55,14 +57,22 @@ class Projector(nn.Module):
 
 
 class Bias(nn.Module):
-    def __init__(self, num_dim: int, nonlinear: nn.Module = nn.Tanh):
+    def __init__(self, dims: Tuple[int], nonlinear: nn.Module = nn.Tanh):
         super().__init__()
-        self.num_dim = num_dim
-        self._bias = nn.Parameter(torch.zeros(num_dim))
+        self.dims = dims
+        self._bias = nn.Parameter(torch.zeros(dims))
         self.nonlinear = nonlinear()
 
     def forward(self):
         return self.nonlinear(self._bias)
+
+    def extra_repr(self):
+
+        out = []
+        out.append(f"dims={self.dims}")
+        out.append(f"nonlinear={self.nonlinear.__class__.__name__}")
+
+        return ", ".join(out)
 
 
 class PositiveReal(nn.Module):
