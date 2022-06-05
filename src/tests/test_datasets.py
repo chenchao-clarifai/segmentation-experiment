@@ -44,3 +44,24 @@ def test_transforms():
         train_cfg.image_size,
         train_cfg.image_size,
     )
+
+
+def test_sharding():
+
+    inds, ws = datasets.utils.shard_batch_indices(
+        input_length=3, mini_batch_size=2, num_mini_batches=3
+    )
+    assert inds == [[0, 1], [2]]
+    assert ws == [1 / 3, 1 / 6]
+
+    inds, ws = datasets.utils.shard_batch_indices(
+        input_length=6, mini_batch_size=2, num_mini_batches=3
+    )
+    assert inds == [[0, 1], [2, 3], [4, 5]]
+    assert ws == [1 / 3, 1 / 3, 1 / 3]
+
+    inds, ws = datasets.utils.shard_batch_indices(
+        input_length=7, mini_batch_size=2, num_mini_batches=3
+    )
+    assert inds == [[0, 1], [2, 3], [4, 5], [6]]
+    assert ws == [1 / 3, 1 / 3, 1 / 3, 1 / 6]
