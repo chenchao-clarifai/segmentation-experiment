@@ -64,8 +64,9 @@ def train_model(epochs):
             loss, acc = train_step(batch)
             epoch_frac = int(100 * bdx / len(train_loader))
             acc *= 100
+            thermo = temp().item()
             logging.info(
-                f"epoch{edx}: {epoch_frac}%, loss={loss:3.2f}, acc={acc:3.2f}%"
+                f"epoch{edx}: {epoch_frac}%, loss={loss:3.2f}, acc={acc:3.2f}%, temp={thermo:3.2f}"
             )
         scheduler.step()
 
