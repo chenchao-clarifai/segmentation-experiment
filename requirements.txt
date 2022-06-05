@@ -1,0 +1,5 @@
+torch
+torchvision
+albumentations
+tqdm
+pytest
