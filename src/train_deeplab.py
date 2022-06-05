@@ -21,7 +21,7 @@ def mini_train_step(mini_batch):
 
     msk = msk - 1  # 0: unlabeled -> -1: ignore
 
-    x = backbone(img)
+    x = backbone(img)["out"]
     logits = get_logits(x)
 
     loss = models.heads.F.cross_entropy(logits, msk, ignore_index=-1)
