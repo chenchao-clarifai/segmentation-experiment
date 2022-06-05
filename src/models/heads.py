@@ -6,7 +6,15 @@ __all__ = ["Projector", "Bias", "PositiveReal"]
 
 
 class Projector(nn.Module):
-    def __init__(self, in_dim, out_dim, normalized=True, norm_type=2.0, weight=None):
+    def __init__(
+        self,
+        in_dim,
+        out_dim,
+        normalized=True,
+        norm_type=2.0,
+        weight=None,
+        channel_last=False,
+    ):
         super().__init__()
         if weight is None:
             weight = torch.randn(out_dim, in_dim)
@@ -18,6 +26,7 @@ class Projector(nn.Module):
         self.out_dim = out_dim
         self.normalized = normalized
         self.norm_type = norm_type
+        self.channel_last = channel_last
 
     def _normalize(self, x):
         return F.normalize(input=x, dim=-1, p=self.norm_type)
@@ -27,7 +36,12 @@ class Projector(nn.Module):
         inputs = self._normalize(inputs)
         projectors = self._normalize(self.weight)
 
-        return torch.einsum("bi, oi -> bo", inputs, projectors)
+        if self.channel_last:
+            outputs = torch.einsum("...i, oi -> ...o", inputs, projectors)
+        else:
+            outputs = torch.einsum("bi..., oi -> bo...", inputs, projectors)
+
+        return outputs
 
     def extra_repr(self):
 
