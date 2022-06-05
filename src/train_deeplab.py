@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import time
 
 import torch
@@ -83,6 +84,7 @@ def train_model(epochs):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a deeplabv3 model.")
+    parser.add_argument("--dataset_root", type=str)
     parser.add_argument("--epochs", type=int)
     parser.add_argument("--device", type=int)
     parser.add_argument("--minibatch", type=int, default=2)
@@ -122,8 +124,8 @@ if __name__ == "__main__":
     train_cfg = datasets.transforms.TrainTransformsConfigs()
     eval_cfg = datasets.transforms.EvalTransformsConfigs()
 
-    PATH_TO_TRAIN_DATA = "/home/scratch/2/cocostuff/train2017/"
-    PATH_TO_TEST_DATA = "/home/scratch/2/cocostuff/val2017/"
+    PATH_TO_TRAIN_DATA = os.path.join(args.dataset_root, "train2017")
+    PATH_TO_TEST_DATA = os.path.join(args.dataset_root, "val2017")
 
     train_transforms = datasets.transforms.get_train_transforms(train_cfg)
     eval_transforms = datasets.transforms.get_eval_transforms(eval_cfg)
