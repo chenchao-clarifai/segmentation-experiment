@@ -147,7 +147,7 @@ if __name__ == "__main__":
     backbone.to(DEVICE)
     projector = models.heads.Projector(in_dim=DIM, out_dim=NUM_CLASSES)
     projector.to(DEVICE)
-    bias = models.heads.Bias(dims=(1, DIM, 1, 1))
+    bias = models.heads.Bias(dims=(1, NUM_CLASSES, 1, 1))
     bias.to(DEVICE)
     temp = models.heads.PositiveReal()
     temp.to(DEVICE)
