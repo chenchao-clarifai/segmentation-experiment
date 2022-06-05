@@ -58,29 +58,36 @@ def train_step(batch):
 
 def train_model(epochs):
 
-    for edx in range(epochs):
-        logging.info(f"epoch {edx}/{epochs} starts")
-        for bdx, batch in enumerate(train_loader):
-            loss, acc = train_step(batch)
-            epoch_frac = int(100 * bdx / len(train_loader))
-            acc *= 100
-            thermo = temp().item()
-            logging.info(
-                f"epoch{edx}: {epoch_frac}%, loss={loss:3.2f}, acc={acc:3.2f}%, temp={thermo:3.2f}"
-            )
-        scheduler.step()
-
-    checkpoint = {
-        "backbone": backbone.state_dict(),
-        "projector": projector.state_dict(),
-        "bias": bias.state_dict(),
-        "temperature": temp.state_dict(),
-    }
-    epoch = min(edx + 1, epochs)
-    time_string = time.asctime().replace("  ", " ").replace(" ", "_").replace(":", ".")
-    checkpoint_path = f"checkpoints/{time_string}-Epoch{epoch}.ckpt"
-    torch.save(checkpoint, checkpoint_path)
-    logging.info(f"Checkpoint saved to {checkpoint_path}")
+    try:
+        for edx in range(epochs):
+            logging.info(f"epoch {edx}/{epochs} starts")
+            for bdx, batch in enumerate(train_loader):
+                loss, acc = train_step(batch)
+                epoch_frac = int(100 * bdx / len(train_loader))
+                acc *= 100
+                thermo = temp().item()
+                logging.info(
+                    f"epoch{edx}: {epoch_frac}%, loss={loss:3.2f}, acc={acc:3.2f}%, temp={thermo:3.2f}"  # noqa
+                )
+            scheduler.step()
+    except Exception as e:
+        logging.exception(e)
+    except KeyboardInterrupt:
+        logging.info(f"Terminated manually at {edx + epoch_frac / 100}.")
+    finally:
+        checkpoint = {
+            "backbone": backbone.state_dict(),
+            "projector": projector.state_dict(),
+            "bias": bias.state_dict(),
+            "temperature": temp.state_dict(),
+        }
+        epoch = edx + epoch_frac / 100
+        time_string = (
+            time.asctime().replace("  ", " ").replace(" ", "_").replace(":", ".")
+        )
+        checkpoint_path = f"checkpoints/{time_string}-Epoch{epoch:3.2f}.ckpt"
+        torch.save(checkpoint, checkpoint_path)
+        logging.info(f"Checkpoint saved to {checkpoint_path}")
 
 
 if __name__ == "__main__":
@@ -88,8 +95,13 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_root", type=str)
     parser.add_argument("--epochs", type=int)
     parser.add_argument("--device", type=int)
-    parser.add_argument("--minibatch", type=int, default=2)
+    parser.add_argument("--minibatch", type=int, default=5)
     parser.add_argument("--accumulate", type=int, default=1)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--thermo_lr", type=float, default=1e-6)
+    parser.add_argument("--wd", type=float, default=1e-5)
+    parser.add_argument("--gamma", type=float, default=0.5)
+    parser.add_argument("--from_checkpoint", type=str, default=None)
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -111,10 +123,10 @@ if __name__ == "__main__":
         f"DEVICE_BATCH_SIZE={DEVICE_BATCH_SIZE}, GRAD_ACCU_STEPS={GRAD_ACCU_STEPS}"
     )
 
-    LR = 1e-3
-    WD = 1e-5
-    THERMO_LR = 1e-6 * LR
-    GAMMA = 0.5
+    LR = args.lr
+    WD = args.wd
+    THERMO_LR = args.thermo_lr
+    GAMMA = args.gamma
     logging.info(f"LR={LR}, WD={WD}, THERMO_LR={THERMO_LR}, GAMMA={GAMMA}")
 
     DEVICE = "cpu" if args.device == -1 else f"cuda:{args.device}"
@@ -157,6 +169,14 @@ if __name__ == "__main__":
     bias.to(DEVICE)
     temp = models.heads.PositiveReal()
     temp.to(DEVICE)
+
+    if args.from_checkpoint:
+        checkpoint = torch.load(args.from_checkpoint)
+        backbone.load_state_dict(checkpoint["backbone"])
+        projector.load_state_dict(checkpoint["projector"])
+        bias.load_state_dict(checkpoint["bias"])
+        temp.load_state_dict(checkpoint["temperature"])
+
     logging.info("models loaded")
 
     optimizer = torch.optim.AdamW(
