@@ -5,7 +5,7 @@ import time
 import torch
 import torchvision
 
-from ..src import datasets, models
+from . import datasets, models
 
 
 def get_logits(embeddings):
