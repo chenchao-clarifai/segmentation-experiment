@@ -84,6 +84,9 @@ def train_model(epochs):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a deeplabv3 model.")
     parser.add_argument("--epochs", type=int)
+    parser.add_argument("--device", type=int)
+    parser.add_argument("--minibatch", type=int, default=2)
+    parser.add_argument("--accumulate", type=int, default=1)
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -98,8 +101,8 @@ if __name__ == "__main__":
     NUM_CLASSES = 182  # 0 is unlabeled will be ignored
     logging.info(f"DIM={DIM}, NUM_CLASSES={NUM_CLASSES}")
 
-    DEVICE_BATCH_SIZE = 5
-    GRAD_ACCU_STEPS = 12
+    DEVICE_BATCH_SIZE = max(1, args.minibatch)
+    GRAD_ACCU_STEPS = max(1, args.accumulate)
     BATCH_SIZE = DEVICE_BATCH_SIZE * GRAD_ACCU_STEPS
     logging.info(
         f"DEVICE_BATCH_SIZE={DEVICE_BATCH_SIZE}, GRAD_ACCU_STEPS={GRAD_ACCU_STEPS}"
@@ -111,7 +114,7 @@ if __name__ == "__main__":
     GAMMA = 0.5
     logging.info(f"LR={LR}, WD={WD}, THERMO_LR={THERMO_LR}, GAMMA={GAMMA}")
 
-    DEVICE = "cpu"
+    DEVICE = "cpu" if args.device == -1 else f"cuda:{args.device}"
     BACKBONE = "deeplabv3_mobilenet_v3_large"
     logging.info(f"DEVICE={DEVICE}, BACKBONE={BACKBONE}")
 
