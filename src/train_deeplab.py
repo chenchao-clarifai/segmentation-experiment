@@ -166,6 +166,6 @@ if __name__ == "__main__":
 
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, GAMMA, verbose=True)
 
-    train_model(args.epoch)
+    train_model(args.epochs)
 
     logging.info("Training was finished.")
