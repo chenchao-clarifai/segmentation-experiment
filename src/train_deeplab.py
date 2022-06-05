@@ -5,7 +5,8 @@ import time
 import torch
 import torchvision
 
-from . import datasets, models
+import datasets
+import models
 
 
 def get_logits(embeddings):
@@ -82,7 +83,7 @@ def train_model(epochs):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a deeplabv3 model.")
-    parser.add_argument("epochs", type=int)
+    parser.add_argument("--epochs", type=int)
     args = parser.parse_args()
 
     logging.basicConfig(
