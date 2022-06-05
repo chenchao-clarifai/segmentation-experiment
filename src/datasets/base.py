@@ -63,7 +63,7 @@ class SemanticSegmentationDataset(VisionDataset):
 
         img = Image.open(
             os.path.join(self.image_root, self.list_of_images[idx])
-        ).convert("RBG")
+        ).convert("RGB")
         msk = Image.open(os.path.join(self.mask_root, self.list_of_masks[idx])).convert(
             "L"
         )
