@@ -98,9 +98,9 @@ if __name__ == "__main__":
     parser.add_argument("--minibatch", type=int, default=5)
     parser.add_argument("--accumulate", type=int, default=1)
     parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--thermo_lr", type=float, default=1e-6)
+    parser.add_argument("--thermo_lr", type=float, default=1e-5)
     parser.add_argument("--wd", type=float, default=1e-5)
-    parser.add_argument("--gamma", type=float, default=0.95)
+    parser.add_argument("--gamma", type=float, default=0.5)
     parser.add_argument("--from_checkpoint", type=str, default=None)
     args = parser.parse_args()
 
