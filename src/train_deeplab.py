@@ -58,6 +58,9 @@ def train_step(batch):
 
 def train_model(epochs):
 
+    epoch_frac = 0
+    edx = 0
+
     try:
         for edx in range(epochs):
             logging.info(f"epoch {edx}/{epochs} starts")
