@@ -95,7 +95,10 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_root", type=str)
     parser.add_argument("--epochs", type=int)
     parser.add_argument(
-        "--backbone", type=str, choices=["mobilenetv3", "resnet50", "resnet101"]
+        "--backbone",
+        type=str,
+        choices=["mobilenetv3", "resnet50", "resnet101"],
+        default="resnet50",
     )
     parser.add_argument("--device", type=int)
     parser.add_argument("--minibatch", type=int, default=5)
