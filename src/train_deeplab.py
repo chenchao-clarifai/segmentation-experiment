@@ -94,6 +94,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a deeplabv3 model.")
     parser.add_argument("--dataset_root", type=str)
     parser.add_argument("--epochs", type=int)
+    parser.add_argument(
+        "--backbone", type=str, choices=["mobilenetv3", "resnet50", "resnet101"]
+    )
     parser.add_argument("--device", type=int)
     parser.add_argument("--minibatch", type=int, default=5)
     parser.add_argument("--accumulate", type=int, default=1)
@@ -130,8 +133,14 @@ if __name__ == "__main__":
     logging.info(f"LR={LR}, WD={WD}, THERMO_LR={THERMO_LR}, GAMMA={GAMMA}")
 
     DEVICE = "cpu" if args.device == -1 else f"cuda:{args.device}"
-    BACKBONE = "deeplabv3_mobilenet_v3_large"
+    BACKBONE = args.backbone
     logging.info(f"DEVICE={DEVICE}, BACKBONE={BACKBONE}")
+
+    backbone_factory = {
+        "mobilenetv3": torchvision.models.segmentation.deeplabv3_mobilenet_v3_large,
+        "resnet50": torchvision.models.segmentation.deeplabv3_resnet50,
+        "resnet101": torchvision.models.segmentation.deeplabv3_resnet101,
+    }
 
     logging.info("loading datasets")
     train_cfg = datasets.transforms.TrainTransformsConfigs()
@@ -159,9 +168,7 @@ if __name__ == "__main__":
     logging.info("dataset loaded")
 
     logging.info("loading models")
-    backbone = torchvision.models.segmentation.deeplabv3_mobilenet_v3_large(
-        num_classes=DIM, pretrained_backbone=True
-    )
+    backbone = backbone_factory[BACKBONE](num_classes=DIM, pretrained_backbone=True)
     backbone.to(DEVICE)
     projector = models.heads.Projector(in_dim=DIM, out_dim=NUM_CLASSES)
     projector.to(DEVICE)
