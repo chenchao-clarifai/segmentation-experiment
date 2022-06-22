@@ -5,7 +5,7 @@ class MetricBase:
     def accumulate(self, *args, **kwargs):
         raise NotImplementedError
 
-    def results(self):
+    def value(self):
         raise NotImplementedError
 
     def __call__(self, predict, target, **kwargs):

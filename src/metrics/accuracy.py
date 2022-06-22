@@ -21,5 +21,5 @@ class Accuracy(MetricBase):
         self._sum_of_accuracy += acc
         self._counts += acc
 
-    def results(self):
+    def value(self) -> float:
         return self._sum_of_accuracy / max(self._counts, self.EPS)
