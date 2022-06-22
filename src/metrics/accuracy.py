@@ -12,9 +12,7 @@ class Accuracy(MetricBase):
         self._sum_of_accuracy = 0.0
         self._counts = 0
 
-    def evaluate(
-        self, predict: torch.LongTensor, target: torch.LongTensor, **kwargs
-    ) -> float:
+    def evaluate(self, predict: torch.LongTensor, target: torch.LongTensor) -> float:
         acc = (predict == target).float().mean()
         return acc.item()
 
