@@ -166,10 +166,10 @@ if __name__ == "__main__":
     )
 
     train_loader = torch.utils.data.DataLoader(
-        train_data, batch_size=BATCH_SIZE, shuffle=True
+        train_data, batch_size=BATCH_SIZE, shuffle=True, drop_last=True
     )
     eval_loader = torch.utils.data.DataLoader(
-        eval_data, batch_size=BATCH_SIZE, shuffle=True
+        eval_data, batch_size=BATCH_SIZE, shuffle=True, drop_last=False
     )
     logging.info("dataset loaded")
 
